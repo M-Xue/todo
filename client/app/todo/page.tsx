@@ -1,6 +1,6 @@
 import React from 'react';
 import ToDoContainer from './ToDoContainer';
-import DayView from './DayView';
+import DayView from './(day-planners)/DayView';
 
 export default function Page() {
 	return (

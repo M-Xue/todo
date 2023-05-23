@@ -1,19 +1,8 @@
 'use client';
 import React from 'react';
-import { useDateStore } from '@/state/date';
-import { format } from 'date-fns';
-import ToDoList from './ToDoList';
-import DateControls from './DateControls';
-
-function DateHeading() {
-	const date = useDateStore((state) => state.date);
-	return (
-		<div>
-			<div>{format(date, 'd LLLL y')}</div>
-			<div>{format(date, 'EEEE')}</div>
-		</div>
-	);
-}
+import ToDoList from './(to-do-list-elements)/ToDoList';
+import DateControls from './(date-elements)/DateControls';
+import DateHeading from './(date-elements)/DateHeading';
 
 export default function ToDoContainer() {
 	return (
