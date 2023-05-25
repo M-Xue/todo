@@ -6,6 +6,8 @@ use thiserror::Error;
 pub enum ToDoError {
     #[error("Iso8601 string could not be parsed to date")]
     Iso8601ParseError,
+    #[error("Database Error")]
+    DatabaseError(sqlx::Error),
 }
 
 impl IntoResponse for ToDoError {

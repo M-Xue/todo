@@ -2,6 +2,7 @@ use crate::errors::to_do_error::ToDoError;
 use crate::AppState;
 use chrono::{DateTime, FixedOffset, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::Row;
 use uuid::Uuid;
 
 // pub struct Date {
@@ -40,8 +41,18 @@ pub struct ToDoJson {
 
 impl ToDoItem {
     pub async fn create_item(self, app_state: AppState) -> Result<Uuid, ToDoError> {
-        return Ok(Uuid::new_v4());
-        // todo!()
+        let query = "insert into ToDoItem (id, title, complete, description) values ($1, $2, $3, $4) returning id";
+        let res = sqlx::query(query)
+            .bind(self.id)
+            .bind(self.title)
+            .bind(self.complete)
+            .bind(self.description)
+            .fetch_one(&app_state.db_conn)
+            .await;
+        match res {
+            Ok(row) => Ok(row.get("id")),
+            Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
+        }
     }
 }
 
