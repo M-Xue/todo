@@ -40,13 +40,16 @@ pub struct ToDoJson {
 
 impl ToDoItem {
     pub async fn create_item(self, app_state: AppState) -> Result<Uuid, ToDoError> {
-        todo!()
+        return Ok(Uuid::new_v4());
+        // todo!()
     }
 }
 
 impl AssignedToDate {
     pub async fn create_assigned_date(self, app_state: AppState) -> Result<(), ToDoError> {
-        todo!()
+        println!("{:?}", self.date);
+        Ok(())
+        // todo!()
     }
 }
 
