@@ -2,7 +2,7 @@ use crate::errors::to_do_error::ToDoError;
 use crate::AppState;
 use chrono::{DateTime, FixedOffset, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::Row;
+use sqlx::{Postgres, QueryBuilder, Row};
 use uuid::Uuid;
 
 // pub struct Date {
@@ -40,7 +40,7 @@ pub struct ToDoJson {
 }
 
 impl ToDoItem {
-    pub async fn create_item(self, app_state: AppState) -> Result<Uuid, ToDoError> {
+    pub async fn create_item(self, app_state: &AppState) -> Result<Uuid, ToDoError> {
         let query = "insert into ToDoItem (id, title, complete, description) values ($1, $2, $3, $4) returning id";
         let res = sqlx::query(query)
             .bind(self.id)
@@ -54,16 +54,34 @@ impl ToDoItem {
             Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
         }
     }
+    pub async fn delete_item(app_state: &AppState, item_id: Uuid) -> Result<Uuid, ToDoError> {
+        let query = "delete from ToDoItem where id = ($1)";
+        let res = sqlx::query(query)
+            .bind(item_id)
+            .execute(&app_state.db_conn)
+            .await;
+        match res {
+            Ok(row) => Ok(item_id),
+            Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
+        }
+    }
 }
 
 impl AssignedToDate {
-    pub async fn create_assigned_date(self, app_state: AppState) -> Result<(), ToDoError> {
-        let query = "insert into AssignedToDate (to_do_item, date) values ($1, $2)";
-        let res = sqlx::query(query)
-            .bind(self.todo_item)
-            .bind(self.date.date_naive())
-            .execute(&app_state.db_conn)
-            .await;
+    pub async fn create_assigned_dates(
+        app_state: &AppState,
+        dates: Vec<AssignedToDate>,
+    ) -> Result<(), ToDoError> {
+        let mut query_builder: QueryBuilder<Postgres> =
+            QueryBuilder::new("insert into AssignedToDate (to_do_item, date) ");
+
+        query_builder.push_values(dates.into_iter(), |mut b, date| {
+            b.push_bind(date.todo_item)
+                .push_bind(date.date.date_naive());
+        });
+
+        let query = query_builder.build();
+        let res = query.execute(&app_state.db_conn).await;
         match res {
             Ok(_) => Ok(()),
             Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
@@ -98,3 +116,18 @@ impl AssignedToDate {
 
 //     todo!()
 // }
+
+// ** VALID FUNCTION
+// pub async fn create_assigned_date(self, app_state: AppState) -> Result<(), ToDoError> {
+//     let query = "insert into AssignedToDate (to_do_item, date) values ($1, $2)";
+//     let res = sqlx::query(query)
+//         .bind(self.todo_item)
+//         .bind(self.date.date_naive())
+//         .execute(&app_state.db_conn)
+//         .await;
+//     match res {
+//         Ok(_) => Ok(()),
+//         Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
+//     }
+// }
+// *****
