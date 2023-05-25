@@ -58,9 +58,16 @@ impl ToDoItem {
 
 impl AssignedToDate {
     pub async fn create_assigned_date(self, app_state: AppState) -> Result<(), ToDoError> {
-        println!("{:?}", self.date);
-        Ok(())
-        // todo!()
+        let query = "insert into AssignedToDate (to_do_item, date) values ($1, $2)";
+        let res = sqlx::query(query)
+            .bind(self.todo_item)
+            .bind(self.date.date_naive())
+            .execute(&app_state.db_conn)
+            .await;
+        match res {
+            Ok(_) => Ok(()),
+            Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
+        }
     }
 }
 
