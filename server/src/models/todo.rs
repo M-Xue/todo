@@ -1,3 +1,4 @@
+use crate::errors::to_do_error::ToDoError;
 use crate::AppState;
 use chrono::{DateTime, FixedOffset, Utc};
 use serde::{Deserialize, Serialize};
@@ -38,13 +39,13 @@ pub struct ToDoJson {
 }
 
 impl ToDoItem {
-    pub async fn create_item(self, app_state: AppState) -> Uuid {
+    pub async fn create_item(self, app_state: AppState) -> Result<Uuid, ToDoError> {
         todo!()
     }
 }
 
 impl AssignedToDate {
-    pub async fn create_assigned_date(self, app_state: AppState) {
+    pub async fn create_assigned_date(self, app_state: AppState) -> Result<(), ToDoError> {
         todo!()
     }
 }

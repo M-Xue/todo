@@ -3,6 +3,7 @@ use std::net::SocketAddr;
 
 mod app_state;
 mod controllers;
+mod errors;
 mod models;
 mod routes;
 

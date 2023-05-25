@@ -2,10 +2,12 @@ use axum::extract::{Path, State};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use chrono::DateTime;
+use futures::future::join_all;
 use serde_json::{json, Value};
 use uuid::Uuid;
 
 use crate::app_state::AppState;
+use crate::errors::to_do_error::ToDoError;
 use crate::models::todo::{AssignedToDate, ToDoItem, ToDoJson};
 
 pub fn routes(app_state: AppState) -> Router {
@@ -16,7 +18,10 @@ pub fn routes(app_state: AppState) -> Router {
         .with_state(app_state)
 }
 
-async fn create_todo(State(app_state): State<AppState>, Json(new_item_data): Json<ToDoJson>) {
+async fn create_todo(
+    State(app_state): State<AppState>,
+    Json(new_item_data): Json<ToDoJson>,
+) -> Result<Json<Value>, ToDoError> {
     println!("get_todo router");
     println!("{:?}", new_item_data);
 
@@ -27,23 +32,42 @@ async fn create_todo(State(app_state): State<AppState>, Json(new_item_data): Jso
         description: new_item_data.description,
     };
 
-    let new_assigned_dates: Vec<AssignedToDate> = new_item_data
+    let new_assigned_dates: Result<Vec<AssignedToDate>, ToDoError> = new_item_data
         .dates
         .iter()
         .map(|iso| {
-            let date = DateTime::parse_from_rfc3339(iso).unwrap(); // TODO: throw a parse error here
-            AssignedToDate {
+            let date = match DateTime::parse_from_rfc3339(iso) {
+                Ok(d) => d,
+                Err(parse_err) => return Err(ToDoError::from(parse_err)),
+            };
+            Ok(AssignedToDate {
                 date,
                 todo_item: new_item.id.clone(),
-            }
+            })
         })
-        .collect::<Vec<AssignedToDate>>();
+        .collect();
 
-    // new_item.create_item(app_state).await?; // TODO: Error
+    let mut futures = Vec::new();
 
-    // new_assigned_dates.into_iter().for_each(|date| async {
-    //     date.create_assigned_date(app_state).await?; // TODO: Error
-    // });
+    match new_assigned_dates {
+        Ok(dates) => {
+            dates.into_iter().for_each(|date| {
+                futures.push(date.create_assigned_date(app_state));
+            });
+        }
+        Err(err) => return Err(err),
+    };
+    join_all(futures).await?;
+
+    let new_id = new_item.create_item(app_state).await?;
+
+    let body = Json(json!({
+        "result": {
+            "success": true,
+            "new_id": new_id
+        }
+    }));
+    Ok(body)
 }
 
 async fn get_date_todo(Path(iso_string): Path<String>) {
@@ -51,5 +75,9 @@ async fn get_date_todo(Path(iso_string): Path<String>) {
     println!("{:?}", date);
 }
 
-// async fn delete_todo(Path(item_id): Path<Uuid>) {}
-// async fn get_todo(Path(item_id): Path<Uuid>) {}
+async fn delete_todo(Path(item_id): Path<Uuid>) {
+    todo!()
+}
+async fn get_todo(Path(item_id): Path<Uuid>) {
+    todo!()
+}
