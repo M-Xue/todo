@@ -45,7 +45,10 @@ impl ToDoController {
                     return Err(db_err);
                 }
             }
-            Err(err) => return Err(err),
+            Err(err) => {
+                let _ = ToDoItem::delete_item(&app_state, new_id).await;
+                return Err(err);
+            }
         }
 
         Ok(new_id)

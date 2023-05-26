@@ -27,6 +27,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .run(&app_state.db_conn)
         .await?;
 
+    sqlx::query("delete from AssignedToDate")
+        .execute(&app_state.db_conn)
+        .await?;
+    sqlx::query("delete from ToDoItem cascade")
+        .execute(&app_state.db_conn)
+        .await?;
+
     let api_routes = routes::routes_todo::routes(app_state);
     let app = Router::new()
         .nest("/api", api_routes)
