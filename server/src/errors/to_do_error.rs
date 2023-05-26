@@ -1,5 +1,4 @@
-use axum::{http::StatusCode, response::IntoResponse, Json};
-use serde_json::json;
+use axum::{http::StatusCode, response::IntoResponse};
 use thiserror::Error;
 
 use super::client_error::{ClientError, Error};

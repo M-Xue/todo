@@ -1,17 +1,14 @@
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::response::IntoResponse;
-use axum::routing::{delete, get, post};
+use axum::routing::{get, post};
 use axum::{Json, Router};
 use chrono::DateTime;
 use serde_json::{json, Value};
-use uuid::Uuid;
 
 use crate::app_state::AppState;
 use crate::controllers::todo_controller::ToDoController;
-use crate::errors::client_error::Error;
 use crate::errors::to_do_error::ToDoError;
-use crate::models::todo::{AssignedToDate, ToDoItem, ToDoJson};
+use crate::models::todo::ToDoJson;
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()

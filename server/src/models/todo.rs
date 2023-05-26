@@ -1,6 +1,6 @@
 use crate::errors::to_do_error::ToDoError;
 use crate::AppState;
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Postgres, QueryBuilder, Row};
 use uuid::Uuid;

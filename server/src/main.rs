@@ -4,10 +4,8 @@ use axum::{
     response::{IntoResponse, Response},
     Json, Router,
 };
-use errors::to_do_error::ToDoError;
 use serde_json::json;
 use std::net::SocketAddr;
-use uuid::Uuid;
 
 mod app_state;
 mod controllers;
@@ -16,12 +14,11 @@ mod models;
 mod routes;
 
 use crate::app_state::AppState;
-
 use crate::errors::client_error::Error;
+use errors::to_do_error::ToDoError;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // TODO: Error above ^^^
     let app_state = AppState {
         db_conn: sqlx::postgres::PgPool::connect("postgres://maxxue@localhost:5432/todo").await?,
     };
