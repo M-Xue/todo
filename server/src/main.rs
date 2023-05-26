@@ -44,14 +44,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn main_response_mapper(uri: Uri, req_method: Method, res: Response) -> Response {
     // -- Get the eventual response error
-    let service_error = res.extensions().get::<ToDoError>(); // TODO: need to make this more generic
-                                                             // -- If client error, build the new response
+    let service_error = res.extensions().get::<ToDoError>(); // TODO: need to make this more generic. Need to some how put the custom Error trait in here instead of a concrete struct type
+
+    // -- If client error, build the new response
     let error_response = service_error.map(|se| {
         let (status_code, client_error) = se.client_status_and_error();
         let (error_message, error_detail) = se.get_error_info();
         let client_error_body = json!({
             "error": {
-                "status": status_code.as_str(),
                 "type": client_error.as_ref(),
                 "message": error_message,
                 "detail": error_detail,

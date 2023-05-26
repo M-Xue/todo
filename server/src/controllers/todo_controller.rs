@@ -35,20 +35,18 @@ impl ToDoController {
             })
             .collect();
 
-        let new_id = new_item.create_item(&app_state).await?; // This needs to go before the create_assigned_date() futures are executed or there won't be a to do row for foreign keys to point to
+        let new_id = new_item.create_item(&app_state).await?;
 
         match new_assigned_dates {
             Ok(dates) => {
-                match AssignedToDate::create_assigned_dates(&app_state, dates).await {
-                    Ok(_) => (),
-                    Err(db_err) => {
-                        let _ = ToDoItem::delete_item(&app_state, new_id).await; // If the batch creation of new assigned dates doesn't go through, delete the new item
-                        return Err(db_err);
-                    }
-                };
+                if let Err(db_err) = AssignedToDate::create_assigned_dates(&app_state, dates).await
+                {
+                    let _ = ToDoItem::delete_item(&app_state, new_id).await; // If the batch creation of new assigned dates doesn't go through, delete the new item
+                    return Err(db_err);
+                }
             }
             Err(err) => return Err(err),
-        };
+        }
 
         Ok(new_id)
     }
