@@ -1,5 +1,5 @@
 use axum::Json;
-use chrono::DateTime;
+use chrono::{DateTime, FixedOffset};
 use futures::future::join_all;
 use uuid::Uuid;
 
@@ -53,5 +53,12 @@ impl ToDoController {
         };
 
         Ok(new_id)
+    }
+
+    pub async fn get_items_by_date(
+        app_state: AppState,
+        date: DateTime<FixedOffset>,
+    ) -> Result<Vec<ToDoItem>, ToDoError> {
+        AssignedToDate::get_items_by_date(app_state, date).await
     }
 }

@@ -2,7 +2,7 @@ use crate::errors::to_do_error::ToDoError;
 use crate::AppState;
 use chrono::{DateTime, FixedOffset, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{Postgres, QueryBuilder, Row};
+use sqlx::{FromRow, Postgres, QueryBuilder, Row};
 use uuid::Uuid;
 
 // pub struct Date {
@@ -25,6 +25,7 @@ pub struct AssignedToDate {
     // pub lexorank: String,
 }
 
+#[derive(Debug, FromRow, Serialize)]
 pub struct ToDoItem {
     pub id: Uuid,
     pub title: String,
@@ -56,12 +57,12 @@ impl ToDoItem {
     }
     pub async fn delete_item(app_state: &AppState, item_id: Uuid) -> Result<Uuid, ToDoError> {
         let query = "delete from ToDoItem where id = ($1)";
-        let res = sqlx::query(query)
+        let query_res = sqlx::query(query)
             .bind(item_id)
             .execute(&app_state.db_conn)
             .await;
-        match res {
-            Ok(row) => Ok(item_id),
+        match query_res {
+            Ok(_) => Ok(item_id),
             Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
         }
     }
@@ -81,9 +82,28 @@ impl AssignedToDate {
         });
 
         let query = query_builder.build();
-        let res = query.execute(&app_state.db_conn).await;
-        match res {
+        let query_res = query.execute(&app_state.db_conn).await;
+        match query_res {
             Ok(_) => Ok(()),
+            Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
+        }
+    }
+
+    pub async fn get_items_by_date(
+        app_state: AppState,
+        date: DateTime<FixedOffset>,
+    ) -> Result<Vec<ToDoItem>, ToDoError> {
+        let query =
+            "select i.id, i.title, i.complete, i.description from ToDoItem i join AssignedToDate d on (i.id = d.to_do_item) where d.date = ($1)";
+
+        let query = sqlx::query_as::<Postgres, ToDoItem>(query);
+        let query_res = query
+            .bind(date.date_naive())
+            .fetch_all(&app_state.db_conn)
+            .await;
+
+        match query_res {
+            Ok(items) => Ok(items),
             Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
         }
     }
@@ -94,26 +114,6 @@ impl AssignedToDate {
 // }
 
 // pub async fn get_item(&self, app_state: AppState, id: Uuid) -> ToDoItem {
-//     todo!()
-// }
-
-// pub async fn get_items_by_date(
-//     &self,
-//     app_state: AppState,
-//     date: DateTime<FixedOffset>,
-// ) -> Vec<ToDoItem> {
-//     let query = "
-//         select *
-//         from ToDoItem i
-//             join AssignedToDate d on (i.id = d.to_do_item)
-//         d.date = $1
-//     ";
-
-//     // sqlx::query(query)
-//     //     .bind(&date)
-//     //     .execute(&app_state.db_conn)
-//     //     .await?;
-
 //     todo!()
 // }
 
