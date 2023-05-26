@@ -2,6 +2,8 @@ use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde_json::json;
 use thiserror::Error;
 
+use super::client_error::{ClientError, Error};
+
 #[derive(Error, Debug, strum_macros::AsRefStr)]
 pub enum ToDoError {
     #[error("Iso8601 string could not be parsed to date")]
@@ -23,21 +25,25 @@ impl IntoResponse for ToDoError {
     }
 }
 
-impl ToDoError {
+impl Error for ToDoError {
     // This method will know how to convert a server error to a client error and status code
-    pub fn client_status_and_error(&self) -> (StatusCode, ToDoClientError) {
-        todo!()
+    fn client_status_and_error(&self) -> (StatusCode, ClientError) {
+        match self {
+            ToDoError::Iso8601ParseError | ToDoError::DatabaseError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ClientError::SERVICE_ERROR,
+            ),
+        }
     }
-}
-
-#[derive(Error, Debug, strum_macros::AsRefStr)]
-// AsRefStr will allow us to serialize the enum variant as a string, which is what we will send back to the client
-#[allow(non_camel_case_types)]
-pub enum ToDoClientError {
-    // LOGIN_FAIL,
-    // NO_AUTH,
-    // INVALID_PARAMS,
-    // SERVICE_ERROR,
+    fn get_error_info(&self) -> (String, String) {
+        match self {
+            ToDoError::Iso8601ParseError => (
+                "ISO8601 parse error".to_string(),
+                "Internal error occurred when parsing ISO8601 for date".to_string(),
+            ),
+            ToDoError::DatabaseError(db_err) => ("Database Error".to_string(), db_err.to_string()),
+        }
+    }
 }
 
 impl std::convert::From<chrono::format::ParseError> for ToDoError {

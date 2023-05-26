@@ -1,14 +1,15 @@
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use chrono::DateTime;
-use futures::future::join_all;
 use serde_json::{json, Value};
 use uuid::Uuid;
 
 use crate::app_state::AppState;
 use crate::controllers::todo_controller::ToDoController;
+use crate::errors::client_error::Error;
 use crate::errors::to_do_error::ToDoError;
 use crate::models::todo::{AssignedToDate, ToDoItem, ToDoJson};
 
@@ -16,7 +17,7 @@ pub fn routes(app_state: AppState) -> Router {
     Router::new()
         .route("/todo/item", post(create_todo))
         .route("/todo/date/:date", get(get_todos_by_date))
-        .route("/todo/item/:id", delete(delete_todo).get(get_todo)) // http://localhost:8080/api/todo/item/1
+        // .route("/todo/item/:id", delete(delete_todo).get(get_todo)) // http://localhost:8080/api/todo/item/1
         .with_state(app_state)
 }
 
@@ -46,9 +47,9 @@ async fn get_todos_by_date(
     }
 }
 
-async fn delete_todo(Path(item_id): Path<Uuid>) {
-    todo!()
-}
-async fn get_todo(Path(item_id): Path<Uuid>) {
-    todo!()
-}
+// async fn delete_todo(Path(item_id): Path<Uuid>) {
+//     todo!()
+// }
+// async fn get_todo(Path(item_id): Path<Uuid>) {
+//     todo!()
+// }

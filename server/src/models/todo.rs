@@ -10,6 +10,7 @@ use uuid::Uuid;
 // }
 
 // // For a particular to do item on a given date, it may have multiple time blocks associated with it. You cannot have overlapping items for a given time. 15 minute increments.
+// // https://www.postgresql.org/docs/current/functions-datetime.html
 // pub struct TimeBlock {
 //     date: DateTime<Utc>,
 //     todo_item: Uuid,
@@ -109,25 +110,5 @@ impl AssignedToDate {
     }
 }
 
-// pub async fn reorder_item(&self, app_state: AppState, id: Uuid, date: DateTime<Utc>,) {
-//     todo!()
-// }
-
-// pub async fn get_item(&self, app_state: AppState, id: Uuid) -> ToDoItem {
-//     todo!()
-// }
-
-// ** VALID FUNCTION
-// pub async fn create_assigned_date(self, app_state: AppState) -> Result<(), ToDoError> {
-//     let query = "insert into AssignedToDate (to_do_item, date) values ($1, $2)";
-//     let res = sqlx::query(query)
-//         .bind(self.todo_item)
-//         .bind(self.date.date_naive())
-//         .execute(&app_state.db_conn)
-//         .await;
-//     match res {
-//         Ok(_) => Ok(()),
-//         Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
-//     }
-// }
-// *****
+// pub async fn reorder_item(&self, app_state: AppState, id: Uuid, date: DateTime<Utc>,) {}
+// pub async fn get_item(&self, app_state: AppState, id: Uuid) -> ToDoItem {}
