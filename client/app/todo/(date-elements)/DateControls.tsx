@@ -12,19 +12,27 @@ export default function DateControls() {
 	]);
 	return (
 		<div>
-			<div>
-				<span>
-					<Button variant='outline' onClick={decrementDate}>
-						<ChevronLeft className='w-4 h-4 mr-2' />
+			<div className='flex items-center'>
+				<span className='mr-3'>
+					<Button
+						variant='outline'
+						onClick={decrementDate}
+						className='mx-1'
+					>
+						<ChevronLeft className='w-4 h-4' />
 					</Button>
-					<Button variant='outline' onClick={incrementDate}>
-						<ChevronRight className='w-4 h-4 mr-2' />
+					<Button
+						variant='outline'
+						onClick={incrementDate}
+						className='mx-1'
+					>
+						<ChevronRight className='w-4 h-4' />
 					</Button>
 				</span>
 				<Button
 					variant='outline'
 					onClick={resetDate}
-					className='text-sm font-normal'
+					className='mr-3 text-sm font-normal'
 				>
 					Today
 				</Button>

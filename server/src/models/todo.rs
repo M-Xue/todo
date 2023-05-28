@@ -1,5 +1,7 @@
 use crate::errors::to_do_error::ToDoError;
 use crate::AppState;
+use axum::response::IntoResponse;
+use axum::response::Response;
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Postgres, QueryBuilder, Row};
@@ -11,6 +13,7 @@ use uuid::Uuid;
 
 // // For a particular to do item on a given date, it may have multiple time blocks associated with it. You cannot have overlapping items for a given time. 15 minute increments.
 // // https://www.postgresql.org/docs/current/functions-datetime.html
+// // Check for timeblock conflics on the backend when entering them manually from calendar view but check it on the front end/backend when in day view
 // pub struct TimeBlock {
 //     date: DateTime<Utc>,
 //     todo_item: Uuid,
@@ -26,7 +29,8 @@ pub struct AssignedToDate {
     // pub lexorank: String,
 }
 
-#[derive(Debug, FromRow, Serialize)]
+#[typeshare::typeshare]
+#[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct ToDoItem {
     pub id: Uuid,
     pub title: String,
@@ -34,12 +38,25 @@ pub struct ToDoItem {
     pub description: String, // Make this markdown later
 }
 
+#[typeshare::typeshare]
 #[derive(Debug, Deserialize)]
-pub struct ToDoJson {
+pub struct RequestCreateToDoItem {
     pub title: String,
     pub description: String, // Make this markdown later
     pub dates: Vec<String>,
 }
+
+#[typeshare::typeshare]
+#[derive(Debug, Serialize)]
+pub struct ResponseGetToDoByDate {
+    pub items: Vec<ToDoItem>,
+}
+
+// impl IntoResponse for ResponseGetToDoByDate {
+//     fn into_response(self) -> Response {
+
+//     }
+// }
 
 impl ToDoItem {
     pub async fn create_item(self, app_state: &AppState) -> Result<Uuid, ToDoError> {

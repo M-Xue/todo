@@ -4,8 +4,10 @@ use axum::{
     response::{IntoResponse, Response},
     Json, Router,
 };
+use http::header::CONTENT_TYPE;
 use serde_json::json;
 use std::net::SocketAddr;
+use tower_http::cors::{Any, CorsLayer};
 
 mod app_state;
 mod controllers;
@@ -34,10 +36,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .execute(&app_state.db_conn)
         .await?;
 
+    let cors = CorsLayer::new()
+        .allow_headers([CONTENT_TYPE])
+        .allow_methods([Method::GET, Method::POST])
+        .allow_origin(Any);
+
     let api_routes = routes::routes_todo::routes(app_state);
     let app = Router::new()
         .nest("/api", api_routes)
-        .layer(middleware::map_response(main_response_mapper));
+        .layer(middleware::map_response(main_response_mapper))
+        .layer(cors);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
     println!("->> LISTENING on {addr}\n");

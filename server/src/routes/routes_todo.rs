@@ -8,7 +8,7 @@ use serde_json::{json, Value};
 use crate::app_state::AppState;
 use crate::controllers::todo_controller::ToDoController;
 use crate::errors::to_do_error::ToDoError;
-use crate::models::todo::{AssignedToDate, ToDoItem, ToDoJson};
+use crate::models::todo::{RequestCreateToDoItem, ResponseGetToDoByDate};
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()
@@ -20,23 +20,24 @@ pub fn routes(app_state: AppState) -> Router {
 
 async fn create_todo(
     State(app_state): State<AppState>,
-    Json(new_item_data): Json<ToDoJson>,
+    Json(new_item_data): Json<RequestCreateToDoItem>,
 ) -> Result<(StatusCode, Json<Value>), ToDoError> {
     let new_id = ToDoController::create_todo_item(app_state, new_item_data).await?;
     let body = Json(json!({ "new_id": new_id }));
     Ok((StatusCode::CREATED, body))
 }
 
+#[axum_macros::debug_handler]
 async fn get_todos_by_date(
     State(app_state): State<AppState>,
     Path(iso_string): Path<String>,
-) -> Result<(StatusCode, Json<Value>), ToDoError> {
+) -> Result<(StatusCode, Json<ResponseGetToDoByDate>), ToDoError> {
     let date = DateTime::parse_from_rfc3339(&iso_string);
     if let Ok(date) = date {
         let res = ToDoController::get_items_by_date(app_state, date).await;
 
         match res {
-            Ok(items) => Ok((StatusCode::OK, Json(json!({ "todo_items": items })))),
+            Ok(items) => Ok((StatusCode::OK, Json(ResponseGetToDoByDate { items }))),
             Err(err) => Err(err),
         }
     } else {

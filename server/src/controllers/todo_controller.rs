@@ -4,14 +4,14 @@ use uuid::Uuid;
 use crate::{
     app_state::AppState,
     errors::to_do_error::ToDoError,
-    models::todo::{AssignedToDate, ToDoItem, ToDoJson},
+    models::todo::{AssignedToDate, RequestCreateToDoItem, ToDoItem},
 };
 
 pub struct ToDoController {}
 impl ToDoController {
     pub async fn create_todo_item(
         app_state: AppState,
-        new_item_data: ToDoJson,
+        new_item_data: RequestCreateToDoItem,
     ) -> Result<Uuid, ToDoError> {
         let new_item = ToDoItem {
             id: Uuid::new_v4(),

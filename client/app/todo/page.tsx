@@ -4,12 +4,8 @@ import DayView from './(day-planners)/DayView';
 
 export default function Page() {
 	return (
-		<div className='h-screen pr-80'>
+		<div className='h-screen'>
 			<ToDoContainer />
-
-			{/* <div>
-				<DayView />
-			</div> */}
 		</div>
 	);
 }

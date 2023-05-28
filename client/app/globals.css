@@ -90,4 +90,8 @@
 	.shadow-raised {
 		box-shadow: rgba(0, 0, 0, 0.15) 0px 9px 17px;
 	}
+	.font-default {
+		font-weight: revert;
+		font-size: revert;
+	}
 }

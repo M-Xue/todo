@@ -1,31 +1,60 @@
 import React from 'react';
 import ToDoItem from './ToDoItem';
-import { UUID } from 'crypto';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ResponseGetToDoByDate } from '@/types/typeshare';
+import { useDateStore } from '@/state/date';
 
-type ToDoItemType = {
-	id: UUID;
-	date: string;
-	title: string;
-	completed: boolean;
-
-	// startTime?: Date
-	// endTime?: Date
-	// description: string;
-	// parentToDo: UUID;
-	// order: number; // For the order they should be rendered as a list
-};
-// Just do a useState mock up for now and implement react query and a backend later
-// Complete the entire ToDoContainer
-// Calendar and weekday goes in ToDoContainer
 export default function ToDoList() {
+	const date = useDateStore((state) => state.date);
+
+	const toDoQuery = useQuery({
+		// You want to crop the ISO string so that the cache key will be the date only. If you use the raw ISO string, every time you reset the date to "Today", the hour/minutes/seconds/milliseconds will change.
+		queryKey: ['todos-by-date', date.toISOString().substring(0, 10)],
+		queryFn: async (): Promise<ResponseGetToDoByDate> => {
+			return fetch(
+				'http://localhost:8080/api/todo/date/' + date.toISOString()
+			)
+				.then((res) => res.json())
+				.catch((err) => {
+					throw Error(err);
+				}); // TODO: check if this is how you catch an error: https://tanstack.com/query/v4/docs/react/guides/query-functions#usage-with-fetch-and-other-clients-that-do-not-throw-by-default
+		},
+		initialData: {
+			// TODO: this is so the initial content on the screen is not is loading. Still need to find a way for cache to persist for longer
+			items: [],
+		},
+	});
+
+	// TODO: Fix these later
+	if (toDoQuery.isLoading) return <h1>Loading...</h1>;
+	if (toDoQuery.isError) return <pre>{JSON.stringify(toDoQuery.error)}</pre>;
+
 	return (
 		<div className='select-none'>
-			<Button variant='outline' className='text-sm font-normal'>
-				Add Task <Plus className='w-4 h-4 mr-2' />
-			</Button>
-			<ToDoItem />
+			{toDoQuery.data.items.map((item, idx) => (
+				<div key={idx}>
+					<ToDoItem todoItem={item} />
+				</div>
+			))}
 		</div>
 	);
 }
+
+// Check how long the cache stays fresh cuz some of the caches are invalidated and the loading signal is shown again
+// * Things skipped in react query:
+// Network mode
+// Window focus refetching
+// Optimistic updates: https://tanstack.com/query/v4/docs/react/guides/optimistic-updates
+
+// type ToDoItemType = {
+// 	id: UUID;
+// 	date: string;
+// 	title: string;
+// 	completed: boolean;
+
+// 	// startTime?: Date
+// 	// endTime?: Date
+// 	// description: string;
+// 	// parentToDo: UUID;
+// 	// order: number; // For the order they should be rendered as a list
+// };
