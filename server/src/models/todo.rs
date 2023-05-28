@@ -52,11 +52,11 @@ pub struct ResponseGetToDoByDate {
     pub items: Vec<ToDoItem>,
 }
 
-// impl IntoResponse for ResponseGetToDoByDate {
-//     fn into_response(self) -> Response {
-
-//     }
-// }
+#[typeshare::typeshare]
+#[derive(Debug, Deserialize)]
+pub struct RequestUpdateToDoItemCompleted {
+    pub completed: bool,
+}
 
 impl ToDoItem {
     pub async fn create_item(self, app_state: &AppState) -> Result<Uuid, ToDoError> {
@@ -81,6 +81,22 @@ impl ToDoItem {
             .await;
         match query_res {
             Ok(_) => Ok(item_id),
+            Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
+        }
+    }
+    pub async fn update_item_completed(
+        app_state: &AppState,
+        item_id: Uuid,
+        completed: bool,
+    ) -> Result<(), ToDoError> {
+        let query = "update ToDoItem set complete = $1 where id = $2";
+        let query_res = sqlx::query(query)
+            .bind(completed)
+            .bind(item_id)
+            .execute(&app_state.db_conn)
+            .await;
+        match query_res {
+            Ok(_) => Ok(()),
             Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
         }
     }

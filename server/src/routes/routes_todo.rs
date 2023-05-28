@@ -1,20 +1,27 @@
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::routing::{get, post};
+use axum::routing::{get, patch, post, put};
 use axum::{Json, Router};
 use chrono::DateTime;
 use serde_json::{json, Value};
+use uuid::Uuid;
 
 use crate::app_state::AppState;
 use crate::controllers::todo_controller::ToDoController;
 use crate::errors::to_do_error::ToDoError;
-use crate::models::todo::{RequestCreateToDoItem, ResponseGetToDoByDate};
+use crate::models::todo::{
+    RequestCreateToDoItem, RequestUpdateToDoItemCompleted, ResponseGetToDoByDate,
+};
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()
         .route("/todo/item", post(create_todo))
         .route("/todo/date/:date", get(get_todos_by_date))
         // .route("/todo/item/:id", delete(delete_todo).get(get_todo)) // http://localhost:8080/api/todo/item/1
+        .route(
+            "/todo/item_completed/:id",
+            patch(update_todo_item_completion_status),
+        ) // http://localhost:8080/api/todo/item/1
         .with_state(app_state)
 }
 
@@ -43,6 +50,15 @@ async fn get_todos_by_date(
     } else {
         Err(ToDoError::Iso8601ParseError)
     }
+}
+
+async fn update_todo_item_completion_status(
+    State(app_state): State<AppState>,
+    Path(item_id): Path<Uuid>,
+    Json(data): Json<RequestUpdateToDoItemCompleted>,
+) -> Result<(StatusCode, ()), ToDoError> {
+    ToDoController::update_todo_item_completion_status(app_state, item_id, data.completed).await?;
+    Ok((StatusCode::NO_CONTENT, ())) // TODO: Should this be no content? Maybe send back the updated body?
 }
 
 // async fn delete_todo(Path(item_id): Path<Uuid>) {

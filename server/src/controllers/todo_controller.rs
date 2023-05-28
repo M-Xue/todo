@@ -60,4 +60,12 @@ impl ToDoController {
     ) -> Result<Vec<ToDoItem>, ToDoError> {
         AssignedToDate::get_items_by_date(app_state, date).await
     }
+
+    pub async fn update_todo_item_completion_status(
+        app_state: AppState,
+        item_id: Uuid,
+        completed: bool,
+    ) -> Result<(), ToDoError> {
+        ToDoItem::update_item_completed(&app_state, item_id, completed).await
+    }
 }
