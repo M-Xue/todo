@@ -4,8 +4,6 @@
 
 import { UUID } from 'crypto';
 
-// * Command: typeshare . --lang=typescript --output-file=../client/types/typeshare.ts
-
 export interface ToDoItem {
 	id: UUID;
 	title: string;
@@ -21,4 +19,8 @@ export interface RequestCreateToDoItem {
 
 export interface ResponseGetToDoByDate {
 	items: ToDoItem[];
+}
+
+export interface RequestUpdateToDoItemCompleted {
+	completed: boolean;
 }

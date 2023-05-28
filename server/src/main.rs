@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cors = CorsLayer::new()
         .allow_headers([CONTENT_TYPE])
-        .allow_methods([Method::GET, Method::POST])
+        .allow_methods([Method::GET, Method::POST, Method::PATCH])
         .allow_origin(Any);
 
     let api_routes = routes::routes_todo::routes(app_state);
@@ -64,6 +64,7 @@ async fn main_response_mapper(uri: Uri, req_method: Method, res: Response) -> Re
     // -- If client error, build the new response
     let error_response = service_error.map(|se| {
         let (status_code, client_error) = se.client_status_and_error();
+        println!("{client_error}");
         let (error_message, error_detail) = se.get_error_info();
         let client_error_body = json!({
             "error": {
@@ -73,8 +74,11 @@ async fn main_response_mapper(uri: Uri, req_method: Method, res: Response) -> Re
                 // TODO: Maybe just put tracing id (uuid) here instead of message and detail and you can check the logs for details instead of giving it to the client
             }
         });
+        println!("{error_message}");
+
         // Build the new response from the client_error_body
         (status_code, Json(client_error_body)).into_response()
     });
+    println!("{uri} {req_method}");
     error_response.unwrap_or(res)
 }
