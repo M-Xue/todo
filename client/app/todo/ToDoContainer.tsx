@@ -3,7 +3,8 @@ import React from 'react';
 import ToDoList from './(to-do-list-elements)/ToDoList';
 import DateControls from './(date-elements)/DateControls';
 import DateHeading from './(date-elements)/DateHeading';
-import { AddItemDialog } from './(to-do-list-elements)/AddItemDialog';
+import { AddItemDialog } from './(add-todo-dialog)/AddItemDialog';
+import { InputReactHookForm } from './(add-todo-dialog)/TestForm';
 
 // Calendar and weekday goes in ToDoContainer
 export default function ToDoContainer() {

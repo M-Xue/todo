@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -10,10 +12,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { Plus, Tag } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDateStore } from '@/state/date';
 import { SyntheticEvent } from 'react';
+import { useForm } from 'react-hook-form';
+import { Textarea } from '@/components/ui/textarea';
+import TagsSelector from './TagsSelector';
 
 export function AddItemDialog() {
 	const date = useDateStore((state) => state.date);
@@ -46,6 +51,8 @@ export function AddItemDialog() {
 			}),
 	});
 
+	// const { register, handleSubmit } = useForm();
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -64,24 +71,30 @@ export function AddItemDialog() {
 				<div className='grid gap-4 py-4'>
 					<div className='grid items-center grid-cols-4 gap-4'>
 						<Label htmlFor='name' className='text-right'>
-							Task
+							Task Title
 						</Label>
 						<Input
 							id='name'
-							value='Pedro Duarte'
+							// value='Pedro Duarte'
 							className='col-span-3'
 						/>
 					</div>
+					{/* <div><DatePickerWithRange/></div> */}
 					<div className='grid items-center grid-cols-4 gap-4'>
 						<Label htmlFor='username' className='text-right'>
 							Description
 						</Label>
-						<Input
+						{/* <Input
 							id='username'
 							value='@peduarte'
 							className='col-span-3'
+						/> */}
+						<Textarea
+							className='col-span-3 resize-none'
+							placeholder='Description...'
 						/>
 					</div>
+					{/* <div><TagsSelector /></div> */}
 				</div>
 				{/* **************************************************** */}
 				{/* **************************************************** */}

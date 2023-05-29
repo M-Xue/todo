@@ -31,8 +31,8 @@ export default function ToDoList() {
 
 	return (
 		<div className='select-none'>
-			{toDoQuery.data.items.map((item, idx) => (
-				<div key={idx}>
+			{toDoQuery.data.items.map((item) => (
+				<div key={item.id}>
 					<ToDoItem todoItem={item} />
 				</div>
 			))}
