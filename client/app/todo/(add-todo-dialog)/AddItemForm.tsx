@@ -71,6 +71,7 @@ export default function AddItemForm({
 	function onSubmit(values: z.infer<typeof createToDoFormSchema>) {
 		console.log(values);
 		newToDoMutation.mutate(values);
+		closeModal();
 	}
 
 	return (
@@ -115,9 +116,11 @@ export default function AddItemForm({
 					)}
 				/>
 
-				<Button type='submit' onClick={closeModal}>
-					Save task
-				</Button>
+				<Button type='submit'>Save task</Button>
+
+				{/* <DialogClose>
+					<Button type='submit'>Save task</Button>
+				</DialogClose> */}
 			</form>
 		</Form>
 	);
