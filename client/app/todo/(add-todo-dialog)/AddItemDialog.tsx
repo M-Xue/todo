@@ -7,7 +7,7 @@ import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
 export function AddItemDialog() {
-	let [isOpen, setIsOpen] = useState(true);
+	let [isOpen, setIsOpen] = useState<boolean>(false);
 
 	function closeModal() {
 		setIsOpen(false);
