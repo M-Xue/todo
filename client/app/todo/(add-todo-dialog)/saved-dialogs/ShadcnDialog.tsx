@@ -18,7 +18,7 @@ import { useDateStore } from '@/state/date';
 import { SyntheticEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { Textarea } from '@/components/ui/textarea';
-import TagsSelector from './TagsSelector';
+import TagsSelector from '../TagsSelector';
 
 export function AddItemDialog() {
 	const date = useDateStore((state) => state.date);
@@ -121,7 +121,7 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
-import AddItemForm from './AddItemForm';
+import AddItemForm from '../AddItemForm';
 import { useState } from 'react';
 
 export function AddItemDialog() {
