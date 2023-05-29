@@ -26,7 +26,11 @@ const createToDoFormSchema = z.object({
 	// dates: z.string().array(),
 });
 
-export default function AddItemForm() {
+export default function AddItemForm({
+	closeModal,
+}: {
+	closeModal: () => void;
+}) {
 	const date = useDateStore((state) => state.date);
 
 	const queryClient = useQueryClient();
@@ -111,10 +115,9 @@ export default function AddItemForm() {
 					)}
 				/>
 
-				<DialogFooter>
-					<DialogClose type='submit'>Save task</DialogClose>
-					{/* <Button type='submit'>Save task</Button> */}
-				</DialogFooter>
+				<Button type='submit' onClick={closeModal}>
+					Save task
+				</Button>
 			</form>
 		</Form>
 	);
