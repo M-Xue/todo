@@ -1,7 +1,7 @@
 import React from 'react';
 import ToDoItem from './ToDoItem';
 import { useQuery } from '@tanstack/react-query';
-import { ResponseGetToDoByDate } from '@/types/typeshare';
+import { ResponseGetToDoByDate, ToDoItemWithRank } from '@/types/typeshare';
 import { useDateStore } from '@/state/date';
 
 export default function ToDoList() {
@@ -29,10 +29,29 @@ export default function ToDoList() {
 	if (toDoQuery.isLoading) return <h1>Loading...</h1>;
 	if (toDoQuery.isError) return <pre>{JSON.stringify(toDoQuery.error)}</pre>;
 
+	function sortToDoRanks(list:ToDoItemWithRank[]) {
+		return list.sort((a, b) => {
+			if (a.rank < b.rank) {
+				return -1;
+			}
+			if (a.rank > b.rank) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+
 	return (
 		<div className='select-none'>
-			{toDoQuery.data.items.map((item) => (
+			{/* {toDoQuery.data.items.map((item) => (
 				<div key={item.id}>
+					{item.rank}
+					<ToDoItem todoItem={item} />
+				</div>
+			))} */}
+			{sortToDoRanks([...toDoQuery.data.items]).map((item) => (
+				<div key={item.id}>
+					{item.rank}
 					<ToDoItem todoItem={item} />
 				</div>
 			))}

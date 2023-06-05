@@ -42,10 +42,7 @@ export default function ToDoItem({ todoItem }: { todoItem: ToDoItemType }) {
 				onCheckedChange={completedToDoMutation.mutate}
 				checked={todoItem.complete}
 			/>
-			<span className='ml-4'>
-				{todoItem.title}
-				{todoItem.id}
-			</span>
+			<span className='ml-4'>{todoItem.title}</span>
 		</div>
 	);
 }

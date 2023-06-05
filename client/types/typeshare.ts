@@ -11,14 +11,22 @@ export interface ToDoItem {
 	description: string;
 }
 
+export interface ToDoItemWithRank {
+	id: UUID;
+	title: string;
+	complete: boolean;
+	description: string;
+	rank: string;
+}
+
 export interface RequestCreateToDoItem {
 	title: string;
 	description: string;
-	dates: string[];
+	dates: string[][];
 }
 
 export interface ResponseGetToDoByDate {
-	items: ToDoItem[];
+	items: ToDoItemWithRank[];
 }
 
 export interface RequestUpdateToDoItemCompleted {

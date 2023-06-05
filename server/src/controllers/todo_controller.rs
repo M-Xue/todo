@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::{
     app_state::AppState,
     errors::to_do_error::ToDoError,
-    models::todo::{AssignedToDate, RequestCreateToDoItem, ToDoItem},
+    models::todo::{AssignedToDate, RequestCreateToDoItem, ToDoItem, ToDoItemWithRank},
 };
 
 pub struct ToDoController {}
@@ -23,7 +23,11 @@ impl ToDoController {
         let new_assigned_dates: Result<Vec<AssignedToDate>, ToDoError> = new_item_data
             .dates
             .iter()
-            .map(|iso| {
+            .map(|date_rank| {
+                // TODO: Proper error handling here
+                let iso = date_rank.get(0).unwrap();
+                let rank = date_rank.get(1).unwrap();
+
                 let date = match DateTime::parse_from_rfc3339(iso) {
                     Ok(d) => d,
                     Err(parse_err) => return Err(ToDoError::from(parse_err)),
@@ -31,6 +35,7 @@ impl ToDoController {
                 Ok(AssignedToDate {
                     date,
                     todo_item: new_item.id.clone(),
+                    rank: rank.clone(),
                 })
             })
             .collect();
@@ -57,7 +62,7 @@ impl ToDoController {
     pub async fn get_items_by_date(
         app_state: AppState,
         date: DateTime<FixedOffset>,
-    ) -> Result<Vec<ToDoItem>, ToDoError> {
+    ) -> Result<Vec<ToDoItemWithRank>, ToDoError> {
         AssignedToDate::get_items_by_date(app_state, date).await
     }
 

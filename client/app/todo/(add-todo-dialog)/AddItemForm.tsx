@@ -19,6 +19,8 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/react-hook-form/form';
+import { LexoRank } from 'lexorank';
+import { ResponseGetToDoByDate, ToDoItemWithRank } from '@/types/typeshare';
 
 const createToDoFormSchema = z.object({
 	title: z.string().min(1).max(100),
@@ -34,6 +36,34 @@ export default function AddItemForm({
 	const date = useDateStore((state) => state.date);
 
 	const queryClient = useQueryClient();
+
+	function sortToDoRanks(list:ToDoItemWithRank[]) {
+		return list.sort((a, b) => {
+			if (a.rank < b.rank) {
+				return -1;
+			}
+			if (a.rank > b.rank) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+
+
+	// console.log(queryClient.getQueryData(['todos-by-date', date.toISOString().substring(0, 10)])) // Getting the current list of items
+	function generateRank(): string {
+		const currDateItems = queryClient.getQueryData<ResponseGetToDoByDate>(['todos-by-date', date.toISOString().substring(0, 10)]);
+
+		if (!currDateItems || currDateItems.items.length == 0) {
+			return LexoRank.middle().toString();
+		} else {
+			
+			const finalIndex = currDateItems.items.length - 1;
+			return LexoRank.parse(sortToDoRanks([...currDateItems.items])[finalIndex].rank).genNext().toString()
+		}
+
+	}
+
 	const newToDoMutation = useMutation({
 		mutationFn: async (data: z.infer<typeof createToDoFormSchema>) => {
 			return fetch('http://localhost:8080/api/todo/item', {
@@ -42,7 +72,8 @@ export default function AddItemForm({
 					// TODO: Make this body typed? maybe give it a type in the input form
 					title: data.title,
 					description: data.description, // Make this markdown later
-					dates: [date.toISOString()],
+					dates: [[date.toISOString(), generateRank()]], /* This second one should be rank. Since we are creating a new to do, it should go at the bottom (last items rank.genNext()). */
+					// Its an array within an array because the inner array is the ISO string data and item rank pair while the other array lets us put multiple date/rank pairs in the future
 				}),
 				headers: {
 					Accept: 'application/json',
@@ -69,7 +100,6 @@ export default function AddItemForm({
 	});
 
 	function onSubmit(values: z.infer<typeof createToDoFormSchema>) {
-		console.log(values);
 		newToDoMutation.mutate(values);
 		closeModal();
 	}
