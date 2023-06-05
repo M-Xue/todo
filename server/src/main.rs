@@ -59,7 +59,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn main_response_mapper(uri: Uri, req_method: Method, res: Response) -> Response {
     // -- Get the eventual response error
-    let service_error = res.extensions().get::<ToDoError>(); // TODO: need to make this more generic. Need to some how put the custom Error trait in here instead of a concrete struct type
+    // let service_error = res.extensions().get::<ToDoError>(); // TODO: need to make this more generic. Need to some how put the custom Error trait in here instead of a concrete struct type
+    let service_error = res.extensions().get::<Box<dyn Error + Send + Sync>>(); // TODO: need to make this more generic. Need to some how put the custom Error trait in here instead of a concrete struct type
+
+    if service_error.is_none() {
+        println!("ok");
+    } else {
+        println!("error");
+    }
 
     // -- If client error, build the new response
     let error_response = service_error.map(|se| {
@@ -74,11 +81,10 @@ async fn main_response_mapper(uri: Uri, req_method: Method, res: Response) -> Re
                 // TODO: Maybe just put tracing id (uuid) here instead of message and detail and you can check the logs for details instead of giving it to the client
             }
         });
-        println!("{error_message}");
-
         // Build the new response from the client_error_body
         (status_code, Json(client_error_body)).into_response()
     });
+
     println!("{uri} {req_method}");
     error_response.unwrap_or(res)
 }

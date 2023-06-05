@@ -14,9 +14,11 @@ pub enum ToDoError {
 impl IntoResponse for ToDoError {
     fn into_response(self) -> axum::response::Response {
         // Create a placeholder axum response and put the error into the placeholder
+        // Any ToDoError should be an INTERNAL_SERVICE_ERROR ()
         let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
         // Insert the Error into the response
-        response.extensions_mut().insert(self);
+        let err_extension: Box<dyn Error + Send + Sync> = Box::new(self);
+        response.extensions_mut().insert(err_extension);
         response
         // This is just a placeholder. The final response of an error will be constructed in the map_response middleware in main.
         // This includes the status code, client error message and the json body.
