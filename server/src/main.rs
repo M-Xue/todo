@@ -71,7 +71,14 @@ async fn main_response_mapper(uri: Uri, req_method: Method, res: Response) -> Re
         let (error_message, error_detail) = res_error.get_error_info();
         let error_id = Uuid::new_v4();
 
-        log::error!("{} {}: {}", error_id, error_message, error_detail);
+        let log_error_body = json!({
+            "error_id": error_id,
+            "message": error_message,
+            "detail": error_detail,
+            "req_method": req_method.to_string(),
+            "uri": uri.to_string(),
+        });
+        log::error!(" - {}", log_error_body);
 
         let client_error_body = json!({
             "error": {

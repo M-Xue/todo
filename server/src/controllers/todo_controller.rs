@@ -24,9 +24,14 @@ impl ToDoController {
             .dates
             .iter()
             .map(|date_rank| {
-                // TODO: Proper error handling here
-                let iso = date_rank.get(0).unwrap();
-                let rank = date_rank.get(1).unwrap();
+                let iso = match date_rank.get(0) {
+                    Some(iso) => iso,
+                    None => Err(ToDoError::CreateToDoParamError("Iso8061 Date".to_string()))?,
+                };
+                let rank = match date_rank.get(1) {
+                    Some(rank) => rank,
+                    None => Err(ToDoError::CreateToDoParamError("Rank".to_string()))?,
+                };
 
                 let date = match DateTime::parse_from_rfc3339(iso) {
                     Ok(d) => d,

@@ -9,6 +9,8 @@ pub enum ToDoError {
     Iso8601ParseError,
     #[error("Database Error")]
     DatabaseError(sqlx::Error),
+    #[error("Incorrect parameters for creating to do item")]
+    CreateToDoParamError(String),
 }
 
 impl IntoResponse for ToDoError {
@@ -30,7 +32,9 @@ impl Error for ToDoError {
     // This method will know how to convert a server error to a client error and status code
     fn client_status_and_error(&self) -> (StatusCode, ClientError) {
         match self {
-            ToDoError::Iso8601ParseError | ToDoError::DatabaseError(_) => (
+            ToDoError::Iso8601ParseError
+            | ToDoError::DatabaseError(_)
+            | ToDoError::CreateToDoParamError(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ClientError::SERVICE_ERROR,
             ),
@@ -43,6 +47,10 @@ impl Error for ToDoError {
                 "Internal error occurred when parsing ISO8601 for date".to_string(),
             ),
             ToDoError::DatabaseError(db_err) => ("Database Error".to_string(), db_err.to_string()),
+            ToDoError::CreateToDoParamError(param) => (
+                "Create To Do Param Error".to_string(),
+                format!("Missing {} parameter for creating to do item", param),
+            ),
         }
     }
 }
