@@ -8,10 +8,12 @@ use http::header::CONTENT_TYPE;
 use serde_json::json;
 use std::net::SocketAddr;
 use tower_http::cors::{Any, CorsLayer};
+use uuid::Uuid;
 
 mod app_state;
 mod controllers;
 mod errors;
+mod logger;
 mod models;
 mod routes;
 
@@ -21,6 +23,8 @@ use errors::to_do_error::ToDoError;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+
     let app_state = AppState {
         db_conn: sqlx::postgres::PgPool::connect("postgres://maxxue@localhost:5432/todo").await?,
     };
@@ -59,32 +63,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn main_response_mapper(uri: Uri, req_method: Method, res: Response) -> Response {
     // -- Get the eventual response error
-    // let service_error = res.extensions().get::<ToDoError>(); // TODO: need to make this more generic. Need to some how put the custom Error trait in here instead of a concrete struct type
-    let service_error = res.extensions().get::<Box<dyn Error + Send + Sync>>(); // TODO: need to make this more generic. Need to some how put the custom Error trait in here instead of a concrete struct type
-
-    if service_error.is_none() {
-        println!("ok");
-    } else {
-        println!("error");
-    }
+    let service_error = res.extensions().get::<Box<dyn Error + Send + Sync>>();
 
     // -- If client error, build the new response
-    let error_response = service_error.map(|se| {
-        let (status_code, client_error) = se.client_status_and_error();
-        println!("{client_error}");
-        let (error_message, error_detail) = se.get_error_info();
+    if let Some(res_error) = service_error {
+        let (status_code, client_error) = res_error.client_status_and_error();
+        let (error_message, error_detail) = res_error.get_error_info();
+        let error_id = Uuid::new_v4();
+
+        log::error!("{} {}: {}", error_id, error_message, error_detail);
+
         let client_error_body = json!({
             "error": {
                 "type": client_error.as_ref(),
-                "message": error_message,
-                "detail": error_detail,
-                // TODO: Maybe just put tracing id (uuid) here instead of message and detail and you can check the logs for details instead of giving it to the client
+                "error_id": error_id,
             }
         });
         // Build the new response from the client_error_body
         (status_code, Json(client_error_body)).into_response()
-    });
-
-    println!("{uri} {req_method}");
-    error_response.unwrap_or(res)
+    } else {
+        res
+    }
 }
