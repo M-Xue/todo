@@ -44,7 +44,6 @@ pub struct ToDoItemWithRank {
     pub id: Uuid,
     pub title: String,
     pub complete: bool,
-    pub description: String, // Make this markdown later
     pub rank: String,
 }
 
@@ -54,6 +53,14 @@ pub struct RequestCreateToDoItem {
     pub title: String,
     pub description: String,     // Make this markdown later
     pub dates: Vec<Vec<String>>, // The inner vector should just be of length 2 for every entry. First string is the ISO date string and the second is the rank
+}
+
+#[typeshare::typeshare]
+#[derive(Debug, Deserialize)]
+pub struct RequestUpdateToDoItemRank {
+    pub iso_string: String,
+    pub item_id: Uuid,
+    pub new_rank: String,
 }
 
 #[typeshare::typeshare]
@@ -149,6 +156,25 @@ impl AssignedToDate {
 
         match query_res {
             Ok(items) => Ok(items),
+            Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
+        }
+    }
+
+    pub async fn update_todo_item_rank(
+        app_state: &AppState,
+        date: DateTime<FixedOffset>,
+        item_id: Uuid,
+        new_rank: String,
+    ) -> Result<(), ToDoError> {
+        let query = "update AssignedToDate set rank = $1 where id = $2 and date = $3";
+        let query_res = sqlx::query(query)
+            .bind(new_rank)
+            .bind(item_id)
+            .bind(date.date_naive())
+            .execute(&app_state.db_conn)
+            .await;
+        match query_res {
+            Ok(_) => Ok(()),
             Err(db_err) => Err(ToDoError::DatabaseError(db_err)),
         }
     }

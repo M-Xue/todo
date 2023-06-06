@@ -78,4 +78,13 @@ impl ToDoController {
     ) -> Result<(), ToDoError> {
         ToDoItem::update_item_completed(&app_state, item_id, completed).await
     }
+
+    pub async fn update_todo_item_rank(
+        app_state: AppState,
+        date: DateTime<FixedOffset>,
+        item_id: Uuid,
+        new_rank: String,
+    ) -> Result<(), ToDoError> {
+        AssignedToDate::update_todo_item_rank(&app_state, date, item_id, new_rank).await
+    }
 }

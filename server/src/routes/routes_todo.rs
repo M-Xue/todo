@@ -10,7 +10,8 @@ use crate::app_state::AppState;
 use crate::controllers::todo_controller::ToDoController;
 use crate::errors::to_do_error::ToDoError;
 use crate::models::todo::{
-    RequestCreateToDoItem, RequestUpdateToDoItemCompleted, ResponseGetToDoByDate,
+    RequestCreateToDoItem, RequestUpdateToDoItemCompleted, RequestUpdateToDoItemRank,
+    ResponseGetToDoByDate,
 };
 
 pub fn routes(app_state: AppState) -> Router {
@@ -22,6 +23,7 @@ pub fn routes(app_state: AppState) -> Router {
             "/todo/item_completed/:id",
             patch(update_todo_item_completion_status),
         ) // http://localhost:8080/api/todo/item/1
+        .route("/todo/re_rank_item", put(update_todo_item_rank))
         .with_state(app_state)
 }
 
@@ -59,6 +61,19 @@ async fn update_todo_item_completion_status(
 ) -> Result<(StatusCode, ()), ToDoError> {
     ToDoController::update_todo_item_completion_status(app_state, item_id, data.completed).await?;
     Ok((StatusCode::NO_CONTENT, ())) // TODO: Should this be no content? Maybe send back the updated body?
+}
+
+async fn update_todo_item_rank(
+    State(app_state): State<AppState>,
+    Json(data): Json<RequestUpdateToDoItemRank>,
+) -> Result<(StatusCode, ()), ToDoError> {
+    let date = DateTime::parse_from_rfc3339(&data.iso_string);
+    if let Ok(date) = date {
+        ToDoController::update_todo_item_rank(app_state, date, data.item_id, data.new_rank).await?;
+        Ok((StatusCode::NO_CONTENT, ())) // TODO: Should this be no content? Maybe send back the updated body?
+    } else {
+        Err(ToDoError::Iso8601ParseError)
+    }
 }
 
 // async fn delete_todo(Path(item_id): Path<Uuid>) {
