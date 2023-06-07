@@ -2,10 +2,21 @@
 
 -   [x] add in ranks 
 -   [ ] drag and drop
--   [ ] login
 -   [ ] fix PATCH
 -   [ ] reduce data from date items get
 -   [ ] debounce/optimistic update checkbox (its currently taking too long for the checkbox data to be sent)
+-   [ ] login
+-   [ ] open up details for to do item
+
+// Check how long the cache stays fresh cuz some of the caches are invalidated and the loading signal is shown again
+// * Things skipped in react query:
+// Network mode
+// Window focus refetching
+// Optimistic updates: https://tanstack.com/query/v4/docs/react/guides/optimistic-updates
+
+
+Set up linting and prettier
+https://www.youtube.com/watch?v=Cd-gBxzcsdA
 
 # Features
 

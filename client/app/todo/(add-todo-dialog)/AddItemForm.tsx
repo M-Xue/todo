@@ -21,6 +21,7 @@ import {
 } from '@/components/react-hook-form/form';
 import { LexoRank } from 'lexorank';
 import { ResponseGetToDoByDate, ToDoItemWithRank } from '@/types/typeshare';
+import { sortToDoRanks } from '@/lib/utils';
 
 const createToDoFormSchema = z.object({
 	title: z.string().min(1).max(100),
@@ -34,21 +35,7 @@ export default function AddItemForm({
 	closeModal: () => void;
 }) {
 	const date = useDateStore((state) => state.date);
-
 	const queryClient = useQueryClient();
-
-	function sortToDoRanks(list:ToDoItemWithRank[]) {
-		return list.sort((a, b) => {
-			if (a.rank < b.rank) {
-				return -1;
-			}
-			if (a.rank > b.rank) {
-				return 1;
-			}
-			return 0;
-		});
-	}
-
 
 	// console.log(queryClient.getQueryData(['todos-by-date', date.toISOString().substring(0, 10)])) // Getting the current list of items
 	function generateRank(): string {
