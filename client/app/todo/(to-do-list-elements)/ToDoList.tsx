@@ -158,14 +158,9 @@ export default function ToDoList() {
 					.toString();
 			}
 		}
-
 		const newRank = listCopy[activeIndex].rank;
-
 		const newList = listCopy.sort(sortRanks);
-
-		console.log(newList);
 		setList(newList);
-
 		newRankMutation.mutate({
 			iso_string: date.toISOString(),
 			item_id: active.id as UUID,
