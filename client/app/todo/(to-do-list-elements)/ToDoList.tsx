@@ -24,7 +24,7 @@ import { LexoRank } from 'lexorank';
 import { UUID } from 'crypto';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-const sortRanks = (a, b) => {
+const sortRanks = (a: ToDoItemWithRank, b: ToDoItemWithRank) => {
 	if (a.rank < b.rank) {
 		return -1;
 	}
@@ -104,13 +104,11 @@ export default function ToDoList() {
 			>
 				<div className='select-none'>
 					{sortToDoRanks([...list]).map((item) => (
-						<DraggableWrapper
+						<ToDoItem
+							todoItem={item}
 							key={item.id.toString() as UniqueIdentifier}
 							id={item.id.toString() as UniqueIdentifier}
-						>
-							{/* {item.rank} */}
-							<ToDoItem todoItem={item} />
-						</DraggableWrapper>
+						/>
 					))}
 				</div>
 			</SortableContext>

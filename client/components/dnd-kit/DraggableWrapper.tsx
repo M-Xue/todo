@@ -17,7 +17,10 @@ export default function DraggableWrapper({
 		transition,
 	};
 	return (
-		<div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+		<div ref={setNodeRef} style={style}>
+			<button {...attributes} {...listeners}>
+				handle
+			</button>
 			{children}
 		</div>
 	);

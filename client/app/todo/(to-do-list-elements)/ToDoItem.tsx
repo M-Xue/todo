@@ -4,7 +4,17 @@ import { ToDoItem as ToDoItemType, ToDoItemWithRank } from '@/types/typeshare';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDateStore } from '@/state/date';
 
-export default function ToDoItem({ todoItem }: { todoItem: ToDoItemWithRank }) {
+import { UniqueIdentifier } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+export default function ToDoItem({
+	todoItem,
+	id,
+}: {
+	todoItem: ToDoItemWithRank;
+	id: UniqueIdentifier;
+}) {
 	// Debounce checkbox POST request
 	const date = useDateStore((state) => state.date);
 
@@ -35,14 +45,32 @@ export default function ToDoItem({ todoItem }: { todoItem: ToDoItemWithRank }) {
 				exact: true,
 			}),
 	});
+
+	const { attributes, listeners, setNodeRef, transform, transition } =
+		useSortable({ id: id });
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition,
+	};
+
 	return (
-		<div className='flex items-center p-2 mb-2 border-box-shadow'>
+		<div ref={setNodeRef} style={style} className='flex items-center mb-2'>
 			{/* use shadow-raised utility class when dragging */}
+
 			<Checkbox
 				onCheckedChange={completedToDoMutation.mutate}
 				checked={todoItem.complete}
+				className='absolute z-10 ml-3'
 			/>
-			<span className='ml-4'>{todoItem.title} {todoItem.rank}</span>
+			<button
+				{...attributes}
+				{...listeners}
+				className='flex items-center w-full p-2 border-box-shadow'
+			>
+				<span className='ml-7'>
+					{todoItem.title} {todoItem.rank}
+				</span>
+			</button>
 		</div>
 	);
 }
