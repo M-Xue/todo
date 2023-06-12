@@ -1,10 +1,10 @@
 import React, { SyntheticEvent } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ToDoItem as ToDoItemType } from '@/types/typeshare';
+import { ToDoItem as ToDoItemType, ToDoItemWithRank } from '@/types/typeshare';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDateStore } from '@/state/date';
 
-export default function ToDoItem({ todoItem }: { todoItem: ToDoItemType }) {
+export default function ToDoItem({ todoItem }: { todoItem: ToDoItemWithRank }) {
 	// Debounce checkbox POST request
 	const date = useDateStore((state) => state.date);
 
@@ -42,7 +42,7 @@ export default function ToDoItem({ todoItem }: { todoItem: ToDoItemType }) {
 				onCheckedChange={completedToDoMutation.mutate}
 				checked={todoItem.complete}
 			/>
-			<span className='ml-4'>{todoItem.title}</span>
+			<span className='ml-4'>{todoItem.title} {todoItem.rank}</span>
 		</div>
 	);
 }

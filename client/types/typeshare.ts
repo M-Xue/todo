@@ -15,14 +15,20 @@ export interface ToDoItemWithRank {
 	id: UUID;
 	title: string;
 	complete: boolean;
-	description: string;
 	rank: string;
+	description: string;
 }
 
 export interface RequestCreateToDoItem {
 	title: string;
 	description: string;
 	dates: string[][];
+}
+
+export interface RequestUpdateToDoItemRank {
+	iso_string: string;
+	item_id: string;
+	new_rank: string;
 }
 
 export interface ResponseGetToDoByDate {
