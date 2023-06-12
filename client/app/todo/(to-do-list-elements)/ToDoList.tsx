@@ -18,9 +18,21 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+
 import DraggableWrapper from '@/components/dnd-kit/DraggableWrapper';
 import { LexoRank } from 'lexorank';
 import { UUID } from 'crypto';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
+const sortRanks = (a, b) => {
+	if (a.rank < b.rank) {
+		return -1;
+	}
+	if (a.rank > b.rank) {
+		return 1;
+	}
+	return 0;
+};
 
 export default function ToDoList() {
 	const date = useDateStore((state) => state.date);
@@ -38,16 +50,7 @@ export default function ToDoList() {
 					throw Error(err);
 				}); // TODO: check if this is how you catch an error: https://tanstack.com/query/v4/docs/react/guides/query-functions#usage-with-fetch-and-other-clients-that-do-not-throw-by-default
 
-			const newList = data.items.sort((a, b) => {
-				if (a.rank < b.rank) {
-					return -1;
-				}
-				if (a.rank > b.rank) {
-					return 1;
-				}
-				return 0;
-			});
-			console.log('query');
+			const newList = data.items.sort(sortRanks);
 			setList(newList);
 			return data;
 		},
@@ -86,13 +89,14 @@ export default function ToDoList() {
 	});
 
 	// TODO: Fix these later
-	// if (toDoQuery.isLoading) return <h1>Loading...</h1>;
-	// if (toDoQuery.isError) return <pre>{JSON.stringify(toDoQuery.error)}</pre>;
+	if (toDoQuery.isLoading) return <h1>Loading...</h1>;
+	if (toDoQuery.isError) return <pre>{JSON.stringify(toDoQuery.error)}</pre>;
 
 	return (
 		<DndContext
 			collisionDetection={closestCenter}
 			onDragEnd={handleDragEnd}
+			modifiers={[restrictToVerticalAxis]}
 		>
 			<SortableContext
 				items={list}
@@ -159,15 +163,7 @@ export default function ToDoList() {
 
 		const newRank = listCopy[activeIndex].rank;
 
-		const newList = listCopy.sort((a, b) => {
-			if (a.rank < b.rank) {
-				return -1;
-			}
-			if (a.rank > b.rank) {
-				return 1;
-			}
-			return 0;
-		});
+		const newList = listCopy.sort(sortRanks);
 
 		console.log(newList);
 		setList(newList);
@@ -179,65 +175,3 @@ export default function ToDoList() {
 		});
 	}
 }
-
-// function handleDragEnd(event: DragEndEvent) {
-// 	const { active, over } = event;
-// 	if (!over || !active || active.id === over.id) return;
-
-// 	// * LexoRank algorithm
-// 	const list = [...toDoItems];
-// 	const listCopy = list.sort((a, b) => {
-// 		if (a.rank < b.rank) {
-// 			return -1;
-// 		}
-// 		if (a.rank > b.rank) {
-// 			return 1;
-// 		}
-// 		return 0;
-// 	});
-
-// 	const idArray = listCopy.map(
-// 		(item) => item.id.toString() as UniqueIdentifier
-// 	);
-// 	const activeIndex = idArray.indexOf(active.id);
-// 	const overIndex = idArray.indexOf(over.id);
-
-// 	let newRank = '';
-
-// 	if (activeIndex > overIndex) {
-// 		if (overIndex === 0) {
-// 			// genPrev
-// 			newRank = LexoRank.parse(listCopy[overIndex].rank)
-// 				.genPrev()
-// 				.toString();
-// 		} else {
-// 			// genBetween with over and prev
-// 			newRank = LexoRank.parse(listCopy[overIndex].rank)
-// 				.between(LexoRank.parse(listCopy[overIndex - 1].rank))
-// 				.toString();
-// 		}
-// 	} else if (activeIndex < overIndex) {
-// 		if (overIndex === listCopy.length - 1) {
-// 			// genNext
-// 			newRank = LexoRank.parse(listCopy[overIndex].rank)
-// 				.genNext()
-// 				.toString();
-// 		} else {
-// 			// genBetween with over and next
-// 			newRank = LexoRank.parse(listCopy[overIndex].rank)
-// 				.between(LexoRank.parse(listCopy[overIndex + 1].rank))
-// 				.toString();
-// 		}
-// 	}
-
-// 	listCopy[activeIndex].rank = newRank;
-// 	setToDoItems(listCopy);
-
-// 	// newRankMutation.mutate({
-// 	// 	iso_string: date.toISOString(),
-// 	// 	item_id: active.id as UUID,
-// 	// 	new_rank: newRank,
-// 	// });
-
-// 	// newRankMutation.mutate();
-// }
