@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // * Personal util
-export function sortToDoRanks(list: ToDoItemWithRank[]) {
+export function sortToDoRanks(list: ToDoItemWithRank[]): ToDoItemWithRank[] {
 	return list.sort((a, b) => {
 		if (a.rank < b.rank) {
 			return -1;

@@ -24,16 +24,6 @@ import { LexoRank } from 'lexorank';
 import { UUID } from 'crypto';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-const sortRanks = (a: ToDoItemWithRank, b: ToDoItemWithRank) => {
-	if (a.rank < b.rank) {
-		return -1;
-	}
-	if (a.rank > b.rank) {
-		return 1;
-	}
-	return 0;
-};
-
 export default function ToDoList() {
 	const date = useDateStore((state) => state.date);
 	const [list, setList] = useState<ToDoItemWithRank[]>([]);
@@ -50,7 +40,7 @@ export default function ToDoList() {
 					throw Error(err);
 				}); // TODO: check if this is how you catch an error: https://tanstack.com/query/v4/docs/react/guides/query-functions#usage-with-fetch-and-other-clients-that-do-not-throw-by-default
 
-			const newList = data.items.sort(sortRanks);
+			const newList = sortToDoRanks([...data.items]);
 			setList(newList);
 			return data;
 		},
@@ -159,7 +149,7 @@ export default function ToDoList() {
 			}
 		}
 		const newRank = listCopy[activeIndex].rank;
-		const newList = listCopy.sort(sortRanks);
+		const newList = sortToDoRanks(listCopy);
 		setList(newList);
 		newRankMutation.mutate({
 			iso_string: date.toISOString(),
