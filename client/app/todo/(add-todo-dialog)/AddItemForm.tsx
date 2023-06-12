@@ -39,16 +39,21 @@ export default function AddItemForm({
 
 	// console.log(queryClient.getQueryData(['todos-by-date', date.toISOString().substring(0, 10)])) // Getting the current list of items
 	function generateRank(): string {
-		const currDateItems = queryClient.getQueryData<ResponseGetToDoByDate>(['todos-by-date', date.toISOString().substring(0, 10)]);
+		const currDateItems = queryClient.getQueryData<ResponseGetToDoByDate>([
+			'todos-by-date',
+			date.toISOString().substring(0, 10),
+		]);
 
 		if (!currDateItems || currDateItems.items.length == 0) {
 			return LexoRank.middle().toString();
 		} else {
-			
 			const finalIndex = currDateItems.items.length - 1;
-			return LexoRank.parse(sortToDoRanks([...currDateItems.items])[finalIndex].rank).genNext().toString()
+			return LexoRank.parse(
+				sortToDoRanks([...currDateItems.items])[finalIndex].rank
+			)
+				.genNext()
+				.toString();
 		}
-
 	}
 
 	const newToDoMutation = useMutation({
@@ -59,7 +64,9 @@ export default function AddItemForm({
 					// TODO: Make this body typed? maybe give it a type in the input form
 					title: data.title,
 					description: data.description, // Make this markdown later
-					dates: [[date.toISOString(), generateRank()]], /* This second one should be rank. Since we are creating a new to do, it should go at the bottom (last items rank.genNext()). */
+					dates: [
+						[date.toISOString(), generateRank()],
+					] /* This second one should be rank. Since we are creating a new to do, it should go at the bottom (last items rank.genNext()). */,
 					// Its an array within an array because the inner array is the ISO string data and item rank pair while the other array lets us put multiple date/rank pairs in the future
 				}),
 				headers: {
@@ -106,7 +113,7 @@ export default function AddItemForm({
 							{/* <FormLabel>Task Title</FormLabel> */}
 							<FormControl>
 								<Input
-									placeholder='Task title'
+									placeholder='Title...'
 									className=''
 									{...field}
 								/>
