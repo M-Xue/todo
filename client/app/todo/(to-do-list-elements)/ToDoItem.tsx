@@ -66,7 +66,7 @@ export default function ToDoItem({
 		<div
 			ref={setNodeRef}
 			style={style}
-			className='flex items-center p-2 mb-2 border-box-shadow'
+			className='z-10 flex items-center p-2 mb-2 border-box-shadow'
 			onClick={(e) => {
 				console.log('click');
 			}}
@@ -77,7 +77,7 @@ export default function ToDoItem({
 				type='button'
 				{...attributes}
 				{...listeners}
-				className='px-[4px] py-[10px] rounded-sm transition-colors hover:bg-accent active:bg-accent '
+				className='px-[4px] py-[10px] rounded-sm transition opacity-25 hover:bg-accent hover:opacity-100 active:bg-accent active:opacity-100 '
 			>
 				<svg viewBox='0 0 20 20' width='12'>
 					<path d='M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z'></path>
@@ -90,10 +90,7 @@ export default function ToDoItem({
 				className='ml-2'
 				onClick={(e: MouseEvent) => e.stopPropagation()}
 			/>
-			<span className='ml-2'>
-				{todoItem.title}
-				{/* {todoItem.rank} */}
-			</span>
+			<span className='ml-2'>{todoItem.title}</span>
 		</div>
 	);
 }

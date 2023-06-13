@@ -20,7 +20,7 @@ export function AddItemDialog() {
 		<>
 			<Button
 				variant='outline'
-				className='text-sm font-normal'
+				className='mt-6 text-sm font-normal w-fit'
 				type='button'
 				onClick={openModal}
 			>

@@ -9,14 +9,18 @@ import { InputReactHookForm } from './(add-todo-dialog)/TestForm';
 // Calendar and weekday goes in ToDoContainer
 export default function ToDoContainer() {
 	return (
-		<div className='h-full py-6 px-9'>
-			<div className='flex justify-between'>
+		<div className='flex flex-col h-full py-6 '>
+			<div className='flex justify-between px-9'>
 				<DateHeading />
 				<DateControls />
 			</div>
-			<div className='mt-6'>
+			<div className='mb-3 px-9'>
 				<AddItemDialog />
-				<div className='mt-4'>
+			</div>
+
+			<div className='flex flex-col pt-3 pb-6 overflow-y-scroll px-9 grow scrollbar-hide'>
+				{/* overflow-y-scroll scrollbar-hide */}
+				<div className='grow'>
 					<ToDoList />
 				</div>
 			</div>

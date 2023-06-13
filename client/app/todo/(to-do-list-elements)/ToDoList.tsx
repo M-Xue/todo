@@ -22,7 +22,11 @@ import {
 import DraggableWrapper from '@/components/dnd-kit/DraggableWrapper';
 import { LexoRank } from 'lexorank';
 import { UUID } from 'crypto';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import {
+	restrictToVerticalAxis,
+	restrictToFirstScrollableAncestor,
+	restrictToParentElement,
+} from '@dnd-kit/modifiers';
 
 export default function ToDoList() {
 	const date = useDateStore((state) => state.date);
@@ -86,13 +90,18 @@ export default function ToDoList() {
 		<DndContext
 			collisionDetection={closestCenter}
 			onDragEnd={handleDragEnd}
-			modifiers={[restrictToVerticalAxis]}
+			modifiers={[
+				restrictToVerticalAxis,
+				restrictToFirstScrollableAncestor,
+				restrictToParentElement,
+			]}
 		>
 			<SortableContext
 				items={list}
 				strategy={verticalListSortingStrategy}
 			>
-				<div className='select-none'>
+				<div className='h-full select-none'>
+					{' '}
 					{sortToDoRanks([...list]).map((item) => (
 						<ToDoItem
 							todoItem={item}
