@@ -166,7 +166,7 @@ impl AssignedToDate {
         item_id: Uuid,
         new_rank: String,
     ) -> Result<(), ToDoError> {
-        let query = "update AssignedToDate set rank = $1 where id = $2 and date = $3";
+        let query = "update AssignedToDate set rank = $1 where to_do_item = $2 and date = $3";
         let query_res = sqlx::query(query)
             .bind(new_rank)
             .bind(item_id)
