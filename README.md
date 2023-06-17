@@ -1,22 +1,39 @@
 # To Do
 
 -   [x] add in ranks 
--   [ ] drag and drop
+-   [x] drag and drop
+-   [x] move the drag handle to the side of the todo list
+-   [x] active and hover bg colors for drag handler
+-   [x] contain to do list within y-scrollable container
+-   [x] get the sort rank util function out of the utils.ts file
+-   [x] reduce data from date items get
 -   [ ] fix PATCH
--   [ ] reduce data from date items get
--   [ ] debounce/optimistic update checkbox (its currently taking too long for the checkbox data to be sent)
--   [ ] login
+-   [x] intersection observer for scrolling in a list (make big list of to do items and start scrolling)
+-   [x] debounce/optimistic update checkbox (its currently taking too long for the checkbox data to be sent)
+-   [ ] fix TODOs and errors (e.g., ToDoItem.tsx)
+
+refactor all the controllers/models so that the routes and controllers are merged
+
+Set up linting and prettier
+https://www.youtube.com/watch?v=Cd-gBxzcsdA
+
+# Login
+
+-   [ ] login page
+-   [ ] cookies middleware
+-   [ ] sql schema for users
+-   [ ] reset account login details with email
+
+# To Do Item Detail
+
 -   [ ] open up details for to do item
+-   [ ] edit to do item content
+-   [ ] markdown description with tip tap
 
 // Check how long the cache stays fresh cuz some of the caches are invalidated and the loading signal is shown again
 // * Things skipped in react query:
 // Network mode
 // Window focus refetching
-// Optimistic updates: https://tanstack.com/query/v4/docs/react/guides/optimistic-updates
-
-
-Set up linting and prettier
-https://www.youtube.com/watch?v=Cd-gBxzcsdA
 
 # Features
 

@@ -15,11 +15,6 @@ export default function ToDoContainer() {
 		root: scrollContainerRef.current,
 	});
 
-	useEffect(() => {
-		console.log(`Render Section ${entry?.isIntersecting}`);
-		return () => {};
-	}, [entry?.isIntersecting]);
-
 	return (
 		<div className='flex flex-col h-full pt-6 '>
 			<div className='flex justify-between px-9'>

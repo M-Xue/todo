@@ -68,7 +68,7 @@ export default function ToDoItem({
 			style={style}
 			className='z-10 flex items-center p-2 mb-2 border-box-shadow'
 			onClick={(e) => {
-				console.log('click');
+				// TODO: open sheet on the side for more info
 			}}
 		>
 			{/* use shadow-raised utility class when dragging */}
