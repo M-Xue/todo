@@ -57,7 +57,7 @@ export default function ToDoItem({
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
-		zIndex: isDragging ? '9999' : undefined,
+		zIndex: isDragging ? '20' : undefined,
 		position: isDragging ? 'relative' : undefined,
 		boxShadow: isDragging ? 'rgba(0, 0, 0, 0.15) 0px 9px 17px' : undefined,
 	};

@@ -98,6 +98,12 @@
 		font-size: revert;
 	}
 
+	.shadow-bottom {
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 3px 0px;
+
+		z-index: 20;
+	}
+
 	/* For Webkit-based browsers (Chrome, Safari and Opera) */
 	.scrollbar-hide::-webkit-scrollbar {
 		display: none;
