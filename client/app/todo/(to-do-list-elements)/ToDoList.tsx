@@ -28,9 +28,15 @@ import {
 	restrictToParentElement,
 } from '@dnd-kit/modifiers';
 
-export default function ToDoList() {
+export default function ToDoList({
+	list,
+	setList,
+}: {
+	list: ToDoItemWithRank[];
+	setList: (newList: ToDoItemWithRank[]) => void;
+}) {
 	const date = useDateStore((state) => state.date);
-	const [list, setList] = useState<ToDoItemWithRank[]>([]);
+	// const [list, setList] = useState<ToDoItemWithRank[]>([]);
 
 	const toDoQuery = useQuery({
 		// You want to crop the ISO string so that the cache key will be the date only. If you use the raw ISO string, every time you reset the date to "Today", the hour/minutes/seconds/milliseconds will change, meaning the cache keys won't match.
