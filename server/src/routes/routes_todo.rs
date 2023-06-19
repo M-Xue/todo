@@ -18,64 +18,50 @@ use crate::models::todo::{
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()
-        .route("/todo/item", post(create_todo))
-        .route("/todo/date/:date", get(get_todos_by_date))
+        .route("/todo/item", post(create_to_do))
+        .route("/todo/date/:date", get(get_to_dos_by_date))
         // .route("/todo/item/:id", delete(delete_todo).get(get_todo)) // http://localhost:8080/api/todo/item/1
         .route(
             "/todo/item_completed/:id",
-            patch(update_todo_item_completion_status),
+            patch(update_to_do_completion_status),
         ) // http://localhost:8080/api/todo/item/1
-        .route("/todo/re_rank_item", put(update_todo_item_rank))
+        .route("/todo/re_rank_item", put(update_to_do_rank))
         .with_state(app_state)
 }
 
-async fn create_todo(
+async fn create_to_do(
     State(app_state): State<AppState>,
     Json(new_item_data): Json<RequestCreateToDoItem>,
 ) -> Result<(StatusCode, Json<Value>), ToDoError> {
-    let new_id = ToDoController::create_todo_item(app_state, new_item_data).await?;
-    let body = Json(json!({ "new_id": new_id }));
-    Ok((StatusCode::CREATED, body))
+    let new_id = ToDoController::create_to_do(app_state, new_item_data).await?;
+    Ok((StatusCode::CREATED, Json(json!({ "new_id": new_id }))))
 }
 
 #[axum_macros::debug_handler]
-async fn get_todos_by_date(
+async fn get_to_dos_by_date(
     State(app_state): State<AppState>,
     Path(iso_string): Path<String>,
 ) -> Result<(StatusCode, Json<ResponseGetToDoByDate>), ToDoError> {
-    let date = DateTime::parse_from_rfc3339(&iso_string);
-    if let Ok(date) = date {
-        let res = ToDoController::get_items_by_date(app_state, date).await;
-
-        match res {
-            Ok(items) => Ok((StatusCode::OK, Json(ResponseGetToDoByDate { items }))),
-            Err(err) => Err(err),
-        }
-    } else {
-        Err(ToDoError::Iso8601ParseError)
-    }
+    let items = ToDoController::get_to_dos_by_date(app_state, iso_string).await?;
+    Ok((StatusCode::OK, Json(ResponseGetToDoByDate { items })))
 }
 
-async fn update_todo_item_completion_status(
+async fn update_to_do_completion_status(
     State(app_state): State<AppState>,
     Path(item_id): Path<Uuid>,
     Json(data): Json<RequestUpdateToDoItemCompleted>,
 ) -> Result<(StatusCode, ()), ToDoError> {
-    ToDoController::update_todo_item_completion_status(app_state, item_id, data.completed).await?;
+    ToDoController::update_to_do_completion_status(app_state, item_id, data.completed).await?;
     Ok((StatusCode::NO_CONTENT, ())) // TODO: Should this be no content? Maybe send back the updated body?
 }
 
-async fn update_todo_item_rank(
+async fn update_to_do_rank(
     State(app_state): State<AppState>,
     Json(data): Json<RequestUpdateToDoItemRank>,
 ) -> Result<(StatusCode, ()), ToDoError> {
-    let date = DateTime::parse_from_rfc3339(&data.iso_string);
-    if let Ok(date) = date {
-        ToDoController::update_todo_item_rank(app_state, date, data.item_id, data.new_rank).await?;
-        Ok((StatusCode::NO_CONTENT, ())) // TODO: Should this be no content? Maybe send back the updated body?
-    } else {
-        Err(ToDoError::Iso8601ParseError)
-    }
+    ToDoController::update_to_do_rank(app_state, data.iso_string, data.item_id, data.new_rank)
+        .await?;
+    Ok((StatusCode::NO_CONTENT, ())) // TODO: Should this be no content? Maybe send back the updated body?
 }
 
 // async fn delete_todo(Path(item_id): Path<Uuid>) {

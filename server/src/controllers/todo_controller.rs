@@ -9,7 +9,7 @@ use crate::{
 
 pub struct ToDoController {}
 impl ToDoController {
-    pub async fn create_todo_item(
+    pub async fn create_to_do(
         app_state: AppState,
         new_item_data: RequestCreateToDoItem,
     ) -> Result<Uuid, ToDoError> {
@@ -64,14 +64,19 @@ impl ToDoController {
         Ok(new_id)
     }
 
-    pub async fn get_items_by_date(
+    pub async fn get_to_dos_by_date(
         app_state: AppState,
-        date: DateTime<FixedOffset>,
+        iso_string: String,
     ) -> Result<Vec<ToDoItemWithRank>, ToDoError> {
-        AssignedToDate::get_items_by_date(app_state, date).await
+        let date = DateTime::parse_from_rfc3339(&iso_string);
+        if let Ok(date) = date {
+            AssignedToDate::get_items_by_date(app_state, date).await
+        } else {
+            Err(ToDoError::Iso8601ParseError)
+        }
     }
 
-    pub async fn update_todo_item_completion_status(
+    pub async fn update_to_do_completion_status(
         app_state: AppState,
         item_id: Uuid,
         completed: bool,
@@ -79,12 +84,17 @@ impl ToDoController {
         ToDoItem::update_item_completed(&app_state, item_id, completed).await
     }
 
-    pub async fn update_todo_item_rank(
+    pub async fn update_to_do_rank(
         app_state: AppState,
-        date: DateTime<FixedOffset>,
+        iso_string: String,
         item_id: Uuid,
         new_rank: String,
     ) -> Result<(), ToDoError> {
-        AssignedToDate::update_todo_item_rank(&app_state, date, item_id, new_rank).await
+        let date = DateTime::parse_from_rfc3339(&iso_string);
+        if let Ok(date) = date {
+            AssignedToDate::update_todo_item_rank(&app_state, date, item_id, new_rank).await
+        } else {
+            Err(ToDoError::Iso8601ParseError)
+        }
     }
 }
