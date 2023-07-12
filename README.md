@@ -7,14 +7,13 @@
 -   [x] contain to do list within y-scrollable container
 -   [x] get the sort rank util function out of the utils.ts file
 -   [x] reduce data from date items get
--   [ ] fix PATCH
 -   [x] intersection observer for scrolling in a list (make big list of to do items and start scrolling)
 -   [x] debounce/optimistic update checkbox (its currently taking too long for the checkbox data to be sent)
+-   [x] refactor all the controllers/models so that the routes and controllers are merged
 -   [ ] fix TODOs and errors (e.g., ToDoItem.tsx)
-
-refactor all the controllers/models so that the routes and controllers are merged
-
-Set up linting and prettier
+    -   [ ] Figure out how useIntersectionObserver() hook works to fix the scroll ui bug in ToDoContainer.tsx
+-   [ ] fix PATCH (either replace it or do it properly)
+-   [ ] set up linting and prettier
 https://www.youtube.com/watch?v=Cd-gBxzcsdA
 
 # Login
