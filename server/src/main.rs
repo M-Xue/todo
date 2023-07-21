@@ -43,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cors = CorsLayer::new()
         .allow_headers([CONTENT_TYPE])
         .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::PUT])
-        .allow_origin(Any);
+        .allow_origin(Any); // TODO: Remove this in production
 
     let api_routes = routes::routes_todo::routes(app_state);
     let app = Router::new()
