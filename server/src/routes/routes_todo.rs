@@ -1,20 +1,51 @@
-use std::str::FromStr;
-
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::routing::{get, patch, post, put};
 use axum::{Json, Router};
-use chrono::DateTime;
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use uuid::Uuid;
 
 use crate::app_state::AppState;
 use crate::controllers::todo_controller::ToDoController;
 use crate::errors::to_do_error::ToDoError;
-use crate::models::todo::{
-    RequestCreateToDoItem, RequestUpdateToDoItemCompleted, RequestUpdateToDoItemRank,
-    ResponseGetToDoByDate,
-};
+use crate::models::todo::ToDoItemWithRank;
+
+// **********************************************
+// * REQUEST/RESPONSE TYPES
+// **********************************************
+
+#[typeshare::typeshare]
+#[derive(Debug, Deserialize)]
+pub struct RequestCreateToDoItem {
+    pub title: String,
+    pub description: String,     // Make this markdown later
+    pub dates: Vec<Vec<String>>, // The inner vector should just be of length 2 for every entry. First string is the ISO date string and the second is the rank
+}
+
+#[typeshare::typeshare]
+#[derive(Debug, Deserialize)]
+pub struct RequestUpdateToDoItemRank {
+    pub iso_string: String,
+    pub item_id: Uuid,
+    pub new_rank: String,
+}
+
+#[typeshare::typeshare]
+#[derive(Debug, Deserialize)]
+pub struct RequestUpdateToDoItemCompleted {
+    pub completed: bool,
+}
+
+#[typeshare::typeshare]
+#[derive(Debug, Serialize)]
+pub struct ResponseGetToDoByDate {
+    pub items: Vec<ToDoItemWithRank>,
+}
+
+// **********************************************
+// * ROUTES
+// **********************************************
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()
@@ -33,7 +64,13 @@ async fn create_to_do(
     State(app_state): State<AppState>,
     Json(new_item_data): Json<RequestCreateToDoItem>,
 ) -> Result<(StatusCode, Json<Value>), ToDoError> {
-    let new_id = ToDoController::create_to_do(app_state, new_item_data).await?;
+    let new_id = ToDoController::create_to_do(
+        app_state,
+        new_item_data.title,
+        new_item_data.description,
+        new_item_data.dates,
+    )
+    .await?;
     Ok((StatusCode::CREATED, Json(json!({ "new_id": new_id }))))
 }
 
