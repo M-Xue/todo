@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::{
     app_state::AppState,
     errors::to_do_error::ToDoError,
-    models::todo::{AssignedToDate, RequestCreateToDoItem, ToDoItem, ToDoItemWithRank},
+    models::todo::{AssignedToDate, ToDoItem, ToDoItemWithRank},
 };
 
 pub struct ToDoController {}

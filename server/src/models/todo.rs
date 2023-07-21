@@ -7,6 +7,10 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Postgres, QueryBuilder, Row};
 use uuid::Uuid;
 
+// **********************************************
+// * MODEL TYPES
+// **********************************************
+
 // pub struct Date {
 //     date: DateTime<Utc>,
 // }
@@ -45,34 +49,6 @@ pub struct ToDoItemWithRank {
     pub title: String,
     pub complete: bool,
     pub rank: String,
-}
-
-#[typeshare::typeshare]
-#[derive(Debug, Deserialize)]
-pub struct RequestCreateToDoItem {
-    pub title: String,
-    pub description: String,     // Make this markdown later
-    pub dates: Vec<Vec<String>>, // The inner vector should just be of length 2 for every entry. First string is the ISO date string and the second is the rank
-}
-
-#[typeshare::typeshare]
-#[derive(Debug, Deserialize)]
-pub struct RequestUpdateToDoItemRank {
-    pub iso_string: String,
-    pub item_id: Uuid,
-    pub new_rank: String,
-}
-
-#[typeshare::typeshare]
-#[derive(Debug, Serialize)]
-pub struct ResponseGetToDoByDate {
-    pub items: Vec<ToDoItemWithRank>,
-}
-
-#[typeshare::typeshare]
-#[derive(Debug, Deserialize)]
-pub struct RequestUpdateToDoItemCompleted {
-    pub completed: bool,
 }
 
 impl ToDoItem {
