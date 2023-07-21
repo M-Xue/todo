@@ -1,7 +1,5 @@
 use crate::errors::to_do_error::ToDoError;
 use crate::AppState;
-use axum::response::IntoResponse;
-use axum::response::Response;
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Postgres, QueryBuilder, Row};

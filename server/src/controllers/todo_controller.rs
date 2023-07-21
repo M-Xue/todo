@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset};
+use chrono::DateTime;
 use uuid::Uuid;
 
 use crate::{
