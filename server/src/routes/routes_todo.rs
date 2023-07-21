@@ -33,7 +33,13 @@ async fn create_to_do(
     State(app_state): State<AppState>,
     Json(new_item_data): Json<RequestCreateToDoItem>,
 ) -> Result<(StatusCode, Json<Value>), ToDoError> {
-    let new_id = ToDoController::create_to_do(app_state, new_item_data).await?;
+    let new_id = ToDoController::create_to_do(
+        app_state,
+        new_item_data.title,
+        new_item_data.description,
+        new_item_data.dates,
+    )
+    .await?;
     Ok((StatusCode::CREATED, Json(json!({ "new_id": new_id }))))
 }
 

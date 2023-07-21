@@ -11,17 +11,18 @@ pub struct ToDoController {}
 impl ToDoController {
     pub async fn create_to_do(
         app_state: AppState,
-        new_item_data: RequestCreateToDoItem,
+        title: String,
+        description: String,
+        dates: Vec<Vec<String>>,
     ) -> Result<Uuid, ToDoError> {
         let new_item = ToDoItem {
             id: Uuid::new_v4(),
-            title: new_item_data.title.clone(),
+            title,
             complete: false,
-            description: new_item_data.description.clone(),
+            description,
         };
 
-        let new_assigned_dates: Result<Vec<AssignedToDate>, ToDoError> = new_item_data
-            .dates
+        let new_assigned_dates: Result<Vec<AssignedToDate>, ToDoError> = dates
             .iter()
             .map(|date_rank| {
                 let iso = match date_rank.get(0) {
